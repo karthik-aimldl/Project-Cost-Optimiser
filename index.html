@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Programme Budget Optimiser V0.9</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#eef1f5;--sf:#fff;--tx:#14213d;--mu:#5b6678;--ln:#dbe1ea;--nv:#0e1b36;--ac:#0b6e80;--ac2:#e3f1f4;--gd:#b8892b;--wn:#b45309;--bd:#b42318;--ok:#157347;--lk:#fdf3d9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1220;--sf:#131d31;--tx:#e8edf6;--mu:#94a3b8;--ln:#25314a;--nv:#0a1426;--ac:#4cc2d6;--ac2:#14303a;--gd:#e0b04e;--wn:#f0a35e;--bd:#f08a80;--ok:#58c38a;--lk:#3a3115}}
+:root[data-theme="dark"]{--bg:#0b1220;--sf:#131d31;--tx:#e8edf6;--mu:#94a3b8;--ln:#25314a;--nv:#0a1426;--ac:#4cc2d6;--ac2:#14303a;--gd:#e0b04e;--wn:#f0a35e;--bd:#f08a80;--ok:#58c38a;--lk:#3a3115}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 'Source Sans 3',system-ui,sans-serif}
+h1,h2,h3,.big{font-family:'Source Serif 4',Georgia,serif;margin:0}
+.hd{background:var(--nv);color:#fff;padding:16px 22px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gd)}
+.hd h1{font-size:22px;color:#fff}.hd p{margin:2px 0 0;color:#aab6cc;font-size:13px}
+.hd .row{display:flex;gap:8px;flex-wrap:wrap}
+main{max-width:1180px;margin:0 auto;padding:16px 16px 60px}
+.bar2{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:14px}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--mu);padding:7px 14px;border-radius:6px;font-weight:600}
+.seg button.on{background:var(--sf);color:var(--tx);box-shadow:0 0 0 1px var(--ln)}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:18px;margin-bottom:14px}
+.card h2{font-size:18px;margin-bottom:12px}
+.g{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
+label{display:flex;flex-direction:column;font-size:12px;font-weight:600;color:var(--mu);gap:4px;flex:1;min-width:140px}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:4px;padding:7px 9px;width:100%}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+button{font:inherit;font-weight:600;border:1px solid var(--ln);background:var(--sf);color:var(--tx);border-radius:4px;padding:8px 14px;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff}button.p:hover{filter:brightness(1.08)}
+.hd button{background:transparent;color:#fff;border-color:#4b5c7e}.hd button.p{background:var(--gd);border-color:var(--gd);color:#14213d}
+button.s{padding:4px 9px;font-size:12px}button.x{color:var(--bd)}
+.chip{padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}.chip.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.k div{background:var(--sf);border:1px solid var(--ln);border-left:4px solid var(--gd);border-radius:6px;padding:12px 14px}
+.k .big{display:block;font-size:26px;line-height:1.2}.k span{font-size:12px;color:var(--mu);font-weight:600}
+.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:620px}
+th{font-size:12px;color:var(--mu);font-weight:600;text-align:left;padding:8px;border-bottom:2px solid var(--ln);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--ln);white-space:nowrap}td.n,th.n{text-align:right}
+td input{min-width:84px;padding:5px 7px}tr.lk td{background:var(--lk)}tr.t td{font-weight:700;border-top:2px solid var(--ln)}
+.pb{height:8px;background:var(--ln);border-radius:4px;overflow:hidden;min-width:90px}.pb i{display:block;height:100%;background:var(--ac)}.pb i.o{background:var(--bd)}
+.m{color:var(--mu)}.w{color:var(--wn)}.b{color:var(--bd)}.ok{color:var(--ok)}
+.note{border-left:4px solid var(--ac);background:var(--ac2);padding:9px 12px;border-radius:4px;margin-bottom:12px}
+.note.w2{border-color:var(--wn);background:var(--lk)}
+.lbl{font-size:12px;font-weight:600;color:var(--mu);margin:10px 0 6px}
+body{background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 14%,var(--bg)),var(--bg) 460px) fixed}
+.hd{background:linear-gradient(115deg,#1e1b4b,#3730a3 48%,#0f766e);border-bottom:4px solid #f59e0b}
+.card{border-top:3px solid var(--ac)}
+th{background:color-mix(in srgb,var(--ac) 9%,var(--sf));color:var(--tx)}
+.seg button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.k div{border:1px solid var(--ln);border-top:4px solid var(--c,var(--ac));background:color-mix(in srgb,var(--c,var(--ac)) 10%,var(--sf))}
+.k .big{color:var(--c,var(--tx))}
+.k div:nth-child(1){--c:#4f46e5}.k div:nth-child(2){--c:#0d9488}.k div:nth-child(3){--c:#d97706}.k div:nth-child(4){--c:#d6336c}.k div:nth-child(5){--c:#0284c7}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}
+.pill{padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:color-mix(in srgb,currentColor 14%,transparent)}
+.tag{display:inline-block;margin:1px 4px 1px 0;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.chip.on{background:color-mix(in srgb,var(--ac) 16%,var(--sf))}
+
+/* UC professional workspace refresh */
+:root{--bg:#f3f6fb;--sf:#ffffff;--tx:#17243b;--mu:#65738a;--ln:#e1e8f2;--nv:#101e36;--ac:#2563eb;--ac2:#eaf1ff;--gd:#f5b544;--lk:#fff4db}
+:root[data-theme="dark"]{--bg:#0d1422;--sf:#162238;--tx:#eaf1ff;--mu:#a6b6ce;--ln:#2b3c55;--nv:#0c1628;--ac:#60a5fa;--ac2:#1b3356;--gd:#f5b544;--lk:#44371e}
+body{background:var(--bg);font-family:'Source Sans 3',system-ui,sans-serif;font-size:14px}
+.hd{position:sticky;top:0;z-index:5;background:linear-gradient(105deg,#101d36,#19375e 65%,#14566a);border-bottom:0;box-shadow:0 8px 28px #0e23402b;padding:17px max(22px,calc((100vw - 1420px)/2))}
+.hd h1{font-family:'Source Sans 3',sans-serif;font-size:21px;letter-spacing:-.5px;font-weight:700}
+.hd p{color:#c8d7ea;font-size:12px}
+.hd button{border-radius:9px;border-color:#526582;background:#ffffff12;transition:.18s}
+.hd button:hover{background:#ffffff28;transform:translateY(-1px)}
+.hd button.p{background:#f5b544;border-color:#f5b544}
+main{max-width:1440px;padding:25px 26px 80px}
+.bar2{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:13px 16px;margin-bottom:23px;box-shadow:0 3px 16px #1b365309}
+.seg{gap:6px}.seg button{border-radius:9px;padding:9px 15px}.seg button.on{background:#2563eb;color:#fff;box-shadow:0 3px 10px #2563eb30}
+.card{border:1px solid var(--ln);border-top:0;border-radius:17px;padding:23px;margin-bottom:19px;box-shadow:0 5px 22px #1b36530b}
+.card h2{font-family:'Source Sans 3',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.35px}
+.k{gap:15px;margin-bottom:20px}.k div{border-radius:15px!important;padding:19px 20px!important;box-shadow:0 5px 18px #1b36530b}.k .big{font-family:'Source Sans 3',sans-serif;font-size:29px;font-weight:750;margin-top:7px}
+button{border-radius:9px;padding:9px 15px;transition:background .15s,transform .15s}button:hover:not(:disabled){filter:brightness(.97)}button.p{background:#2563eb;border-color:#2563eb}
+input,select{border-radius:9px;padding:9px 11px;background:var(--sf)}label{font-size:12px}
+.sc{border:1px solid var(--ln);border-radius:11px;overflow:auto;max-height:620px}table{min-width:650px}th{position:sticky;top:0;z-index:1;background:var(--bg);font-weight:700;color:var(--mu);padding:12px 13px}td{padding:11px 13px}tbody tr:hover td{background:color-mix(in srgb,var(--ac) 4%,var(--sf))}
+.note{border-radius:10px;padding:12px 15px}.pb{height:9px}
+.workspace-intro{margin:2px 0 17px;display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.workspace-intro h2{font-size:23px;font-family:'Source Sans 3',sans-serif;font-weight:750;letter-spacing:-.5px}
+.workspace-intro p{margin:3px 0 0;color:var(--mu)}
+#sy{display:inline-flex;align-items:center;gap:5px}
+#sy::before{content:'●';color:#67e8a5;font-size:9px}
+@media(max-width:750px){.hd{position:static;padding:16px}.hd .row{width:100%}.hd .row button{flex:1}main{padding:16px 12px 60px}.card{padding:16px}.bar2{padding:12px}.k{grid-template-columns:repeat(2,minmax(0,1fr))}.k .big{font-size:22px}.seg button{padding:8px 11px}.sc{max-height:540px}}
+
+/* V0.8: theme-aware executive workspace */
+:root[data-palette="ocean"]{--bg:#f2f7fc;--sf:#fff;--tx:#14273f;--mu:#61748c;--ln:#dce7f1;--ac:#087cb4;--ac2:#e6f5ff;--nv:#102c47;--gd:#4ad4cb;--hero1:#102d49;--hero2:#087eae;--hero3:#11a6a0;--glow:#12b6d1}
+:root[data-palette="royal"]{--bg:#f6f4fc;--sf:#fff;--tx:#2a2249;--mu:#756d8d;--ln:#e6e0f2;--ac:#6d46d9;--ac2:#f0ebff;--nv:#251a4c;--gd:#b49dff;--hero1:#241747;--hero2:#5a36ad;--hero3:#8b57d9;--glow:#ae8aff}
+:root[data-palette="emerald"]{--bg:#f0f8f5;--sf:#fff;--tx:#173a30;--mu:#627c73;--ln:#dbece4;--ac:#09856d;--ac2:#e0f7ee;--nv:#12392f;--gd:#86e7a8;--hero1:#103b32;--hero2:#087a67;--hero3:#39b38e;--glow:#5ee5ad}
+:root[data-palette="sunset"]{--bg:#fff8f1;--sf:#fff;--tx:#422b28;--mu:#8c7067;--ln:#f0e3d6;--ac:#d35a32;--ac2:#fff0e4;--nv:#492820;--gd:#ffd27b;--hero1:#49271f;--hero2:#bb5233;--hero3:#e39a4a;--glow:#ffbc75}
+:root[data-palette="rose"]{--bg:#fdf4f8;--sf:#fff;--tx:#412439;--mu:#886b80;--ln:#f1dfeb;--ac:#c13981;--ac2:#ffeaf4;--nv:#462039;--gd:#f8a4d2;--hero1:#452039;--hero2:#a82e72;--hero3:#dd6e9e;--glow:#ff9dcb}
+:root[data-palette="midnight"]{--bg:#0b1221;--sf:#152138;--tx:#e9f2ff;--mu:#a3b5d0;--ln:#2b3c58;--ac:#68b7ff;--ac2:#203958;--nv:#0a1528;--gd:#6fe4d7;--hero1:#091226;--hero2:#19345c;--hero3:#126c7b;--glow:#42cce1;--lk:#473a26;--wn:#ffc17c;--bd:#ff9292;--ok:#6ce6a4}
+body{background:radial-gradient(circle at 6% 2%,color-mix(in srgb,var(--ac) 10%,transparent),transparent 36%),var(--bg)}
+.hd{position:relative;display:block;padding:0 max(24px,calc((100vw - 1460px)/2));background:linear-gradient(112deg,var(--hero1),var(--hero2) 68%,var(--hero3));color:white;border:0;box-shadow:0 10px 35px #101b3430}
+.hd:after{content:'';position:absolute;pointer-events:none;inset:0;background:radial-gradient(circle at 90% 15%,color-mix(in srgb,var(--glow) 22%,transparent),transparent 33%)}
+.header-top,.header-actions{position:relative;z-index:1;display:flex;justify-content:space-between;gap:20px;align-items:center}
+.header-top{min-height:116px;padding:24px 0 20px}
+.header-left{display:flex;align-items:center;gap:15px}.brand-mark{display:grid;place-items:center;width:53px;height:53px;background:#ffffff20;border:1px solid #ffffff50;border-radius:17px;font-weight:800;font-size:27px;box-shadow:inset 0 1px #ffffff40}.brand-mark span{color:var(--gd);font-size:21px}
+.brand-eyebrow{font-size:11px;letter-spacing:2px;font-weight:800;color:#e8f7ff}.brand-sub{font-size:13px;color:#dce9f6;margin-top:6px}
+.header-right{text-align:right}.brand-title{font-size:29px;letter-spacing:-.8px;font-weight:400;line-height:1.2}.brand-title strong{font-weight:800}.brand-tagline{font-size:13px;color:#e3f0f9;margin-top:7px}.version-label{font-size:10px;letter-spacing:1.7px;font-weight:800;color:var(--gd);display:block;margin-bottom:8px}
+.header-actions{padding:13px 0;border-top:1px solid #ffffff38;flex-wrap:wrap}.action-group{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.hd .action-group button{border:1px solid #ffffff4d;border-radius:10px;background:#ffffff18;color:white;padding:9px 13px}.hd .action-group button:hover{background:#ffffff30}.hd .action-group button.p{background:#fff;color:#183c5b;border-color:#fff;font-weight:800}.save-status{display:flex;align-items:center;gap:8px;font-size:12px;color:#e5f2ff}.status-led{width:8px;height:8px;border-radius:50%;background:#7af2b0;box-shadow:0 0 0 4px #7af2b02b}
+.theme-select{display:flex;flex-direction:row;gap:9px;align-items:center;min-width:auto;flex:none;color:#eef7ff;font-size:12px}.theme-select select{width:155px;background:#ffffff;color:#23314a;border-color:#fff;padding:8px 10px}
+main{max-width:1500px;padding:25px 25px 80px}.bar2{gap:16px;border-radius:16px;align-items:center;box-shadow:0 8px 30px #102c4710}.nav-primary{gap:5px}.seg button.on{background:var(--ac);box-shadow:0 3px 13px color-mix(in srgb,var(--ac) 25%,transparent)}.nav-workspace{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.nav-workspace label{min-width:210px;flex:none}.nav-workspace button{white-space:nowrap}
+.card{box-shadow:0 9px 32px #101d3010}.card h2{color:var(--tx)}.k div{background:color-mix(in srgb,var(--ac) 5%,var(--sf))!important;border-top-color:var(--ac)!important}.k .big{color:var(--tx)}button.p{background:var(--ac);border-color:var(--ac)}input:focus,select:focus,button:focus-visible{outline-color:var(--ac)}.workspace-intro h2{color:var(--tx)}
+@media(max-width:1050px){.header-actions{align-items:flex-start}.header-top{gap:18px}.brand-title{font-size:25px}.nav-workspace{width:100%}.nav-workspace label{flex:1}}
+@media(max-width:650px){.hd{padding:0 16px}.header-top{align-items:flex-start;flex-direction:column;padding:20px 0}.header-right{text-align:left}.brand-title{font-size:24px}.header-actions{gap:13px}.action-group{width:100%}.action-group button{flex:1}.theme-select{width:100%;justify-content:space-between}.theme-select select{width:55%}main{padding:16px 12px 60px}.nav-primary{width:100%}.nav-primary button{flex:1;padding:8px 6px;font-size:12px}.nav-workspace label{min-width:0}.workspace-intro{align-items:flex-start}}
+
+/* V0.9 executive navigation and charts */
+.shell{display:grid;grid-template-columns:244px minmax(0,1fr);min-height:calc(100vh - 170px);max-width:1700px;margin:auto}.side{background:var(--sf);border-right:1px solid var(--ln);padding:25px 14px;position:sticky;top:0;align-self:start;height:calc(100vh - 1px);overflow:auto;box-shadow:6px 0 24px #101d3008}.side-label{font-size:10px;letter-spacing:1.8px;font-weight:800;color:var(--mu);padding:8px 12px;margin:8px 0}.side-nav{display:flex;flex-direction:column;gap:6px}.side-nav button{width:100%;text-align:left;border:0;background:transparent;border-radius:12px;padding:13px;color:var(--mu);font-weight:700}.side-nav button:hover{background:var(--ac2);color:var(--ac)}.side-nav button.on{background:var(--ac2);color:var(--ac);box-shadow:inset 4px 0 var(--ac)}.side-foot{margin-top:28px;border-top:1px solid var(--ln);padding:18px 10px;color:var(--mu);font-size:12px}.side-toggle{border-radius:10px;margin-bottom:18px;width:100%;text-align:left}.shell.collapsed{grid-template-columns:74px minmax(0,1fr)}.shell.collapsed .side-label,.shell.collapsed .nav-name,.shell.collapsed .side-foot,.shell.collapsed .side-toggle .nav-name{display:none}.shell.collapsed .side-nav button{text-align:center}.shell.collapsed .side-toggle{text-align:center}.shell main{max-width:none;min-width:0;width:100%;margin:0}.shell .bar2 .nav-primary{display:none}.visual-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;margin:0 0 16px}.viz-card{min-width:0}.viz-caption{font-size:12px;color:var(--mu);margin:0 0 18px}.viz-row{display:grid;grid-template-columns:minmax(105px,1fr) 2fr 85px;align-items:center;gap:12px;margin:14px 0}.viz-row .viz-name{font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.viz-track{height:14px;border-radius:12px;background:var(--ln);overflow:hidden}.viz-track>span{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--hero3));border-radius:12px}.viz-row .viz-value{text-align:right;font-weight:700;font-size:12px}.donut-layout{display:flex;align-items:center;gap:24px;justify-content:center;flex-wrap:wrap}.donut{width:180px;height:180px;border-radius:50%;display:grid;place-items:center;flex-shrink:0}.donut-core{width:128px;height:128px;border-radius:50%;background:var(--sf);display:flex;align-items:center;justify-content:center;flex-direction:column}.donut-core strong{font-size:28px}.donut-core small{color:var(--mu)}.legend{display:flex;flex-direction:column;gap:10px;font-size:13px}.legend span i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:9px}.sidebar-workspace{padding:10px 4px}.sidebar-workspace select{width:100%;margin:8px 0}.sidebar-workspace button{width:100%;margin-top:8px}.sidebar-workspace label{display:block;min-width:0}.side.collapsed .sidebar-workspace{display:none}@media(max-width:1050px){.shell{grid-template-columns:200px minmax(0,1fr)}.visual-grid{grid-template-columns:1fr}}@media(max-width:760px){.shell,.shell.collapsed{display:block}.side{position:relative;height:auto;padding:10px 12px}.side-nav{flex-direction:row;overflow-x:auto}.side-nav button{white-space:nowrap}.side-toggle,.side-label,.side-foot,.sidebar-workspace{display:none}.shell.collapsed .nav-name{display:inline}.shell main{padding:16px 12px 55px}.visual-grid{grid-template-columns:1fr}}
+</style></head><body><div id="app"></div>
+<script>
+const $=s=>document.querySelector(s);let uid=10;
+const E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const mk=()=>({id:++uid,name:'Digital Transformation',budget:300000,months:3,start:'2026-10',mlock:[],selM:null,selP:null,
+projects:[{id:1,name:'Customer Portal',budget:130000,demand:4,prio:3,lock:false},{id:2,name:'Data Platform',budget:110000,demand:3.5,prio:2,lock:false},{id:3,name:'Process Automation',budget:60000,demand:2,prio:1,lock:false}],
+res:[{id:1,name:'Asha (Dev)',cost:9000,cap:1},{id:2,name:'Ben (Dev)',cost:8000,cap:1},{id:3,name:'Chen (Data)',cost:10500,cap:1},{id:4,name:'Dee (Analyst)',cost:6000,cap:1},{id:5,name:'Eli (Contractor)',cost:13000,cap:2},{id:6,name:'Fay (PM)',cost:9500,cap:1},{id:7,name:'Gus (Junior)',cost:4500,cap:1}],
+plan:null,cands:[],ci:0,month:0,stale:false});
+let DB=load(),S=DB.progs[DB.cur],DL=null;let localDb=null,hydrated=false;
+
+const fmt=n=>Math.round(n).toLocaleString('en-GB'),r2=x=>Math.floor(x*100+1e-6)/100;
+const inM=m=>!S.selM||S.selM.includes(m),inP=p=>!S.selP||S.selP.includes(p.id);
+const KK=()=>S.unit=='day'?(S.wd||20):1,UL=()=>S.unit=='day'?'days':'FTE',D2=v=>+(v*KK()).toFixed(2);
+const COL=['#4f46e5','#0d9488','#e08a00','#d6336c','#0284c7','#7c3aed','#2f9e44','#c2410c'],PC=i=>COL[i%8];
+function resCard(){const M=S.months,pl=S.plan,P=S.projects;
+ const rows=S.res.map(r=>{let used=0,c=0;const by=P.map((p,pi)=>{let f=0;for(let m=0;m<M;m++)f+=((pl[m]||{})[p.id]||{})[r.id]||0;used+=f;c+=f*r.cost;return f?`<span class="tag" style="--c:${PC(pi)}">${E(p.name)} ${D2(f/M)}</span>`:''}).join('');
+  const pct=r.cap*M?used/(r.cap*M)*100:0;
+  return `<tr><td><b>${E(r.name)}</b></td><td class="n">${fmt(r.cost/KK())}</td><td class="n">${D2(r.cap)}</td><td class="n">${D2(used/M)}</td><td><div class="pb"><i class="${pct>100?'o':''}" style="${pct>100?'':'background:'+(pct<50?'#e08a00':'#0d9488')+';'}width:${Math.min(100,pct)}%"></i></div></td><td class="n">${pct.toFixed(0)}%</td><td class="n">${fmt(c)}</td><td>${by||'<span class="m">Unassigned</span>'}</td></tr>`}).join('');
+ return `<div class="card"><h2>Resource utilisation</h2><div class="sc"><table><tr><th>Resource</th><th class="n">Cost per ${S.unit=='day'?'day':'month'}</th><th class="n">Available (${UL()})</th><th class="n">Allocated per month</th><th>Utilisation</th><th class="n">%</th><th class="n">Cost</th><th>Working on</th></tr>${rows}</table></div><p class="m" style="margin:10px 0 0">Amber means under 50% used: spare capacity you could redeploy.</p></div>`}
+function resView(){
+ const R=S.res.map((r,i)=>`<tr><td><input value="${E(r.name)}" onchange="U('res',${i},'name',this.value)"></td><td><select onchange="moveRes(${i},+this.value)">${DB.progs.map((q,qi)=>`<option value="${qi}" ${qi==DB.cur?'selected':''}>${E(q.name)}</option>`).join('')}</select></td><td><select onchange="U('res',${i},'proj',+this.value||null)"><option value="0">Shared across programme</option>${S.projects.map(p=>`<option value="${p.id}" ${r.proj==p.id?'selected':''}>${E(p.name)}</option>`).join('')}</select></td><td><input type="number" min="0" value="${+(r.cost/KK()).toFixed(2)}" onchange="U('res',${i},'cost',+this.value*KK())"></td><td><input type="number" min="0" step="0.5" value="${D2(r.cap)}" onchange="U('res',${i},'cap',+this.value/KK())"></td><td class="n">${fmt(r.cost)}</td><td><button class="s x" onclick="del('res',${i})">Remove</button></td></tr>`).join('');
+ const cp=S.res.reduce((a,r)=>a+r.cap,0),dm=S.projects.reduce((a,p)=>a+p.demand,0);
+ return `<div class="card"><h2>Resources: ${E(S.name)}</h2>${dupNote()}<p class="m" style="margin:0 0 10px">Each resource belongs to one programme. Pick a project to dedicate someone to it; they will only be assigned there. Shared resources can be used by any project in the programme.</p><div class="sc"><table><tr><th>Name or role</th><th>Programme</th><th>Project</th><th>Cost per ${S.unit=='day'?'day':'FTE per month'}</th><th>Available ${UL()} per month</th><th class="n">Monthly cost per FTE</th><th></th></tr>${R}</table></div>
+ <div class="g" style="margin-top:10px"><button class="p" onclick="add('res')">Add resource</button><button onclick="optimise()">Optimise plan</button></div>
+ <p class="${dm>cp?'w':'m'}" style="margin:10px 0 0">Demand ${D2(dm)} ${UL()} against capacity ${D2(cp)} ${UL()}${dm>cp?' – some demand cannot be met':''}. Switch between per-day and per-month in Setup.</p></div>`}
+function moveRes(i,qi){if(qi==DB.cur)return;const r=S.res.splice(i,1)[0];r.proj=null;const t=DB.progs[qi];t.res.push(r);t.stale=!!t.plan;S.stale=!!S.plan;render()}
+function dupNote(){const c={},n=r=>r.name.trim().toLowerCase();DB.progs.forEach(q=>q.res.forEach(r=>{(c[n(r)]=c[n(r)]||new Set()).add(q.id)}));const d=S.res.filter(r=>c[n(r)].size>1).map(r=>E(r.name));return d.length?`<div class="note w2">${d.join(', ')} appear in more than one programme, so their capacity is counted in each. Remove the extra entries or lower their available time so nobody is double-booked.</div>`:''}
+let DBX=null,syncT=null,busy=false,SYNC='Local autosave';const sent={};
+const sid=q=>'p'+q.id,ser=q=>JSON.stringify(q,(k,v)=>['cands','month','selM','selP'].includes(k)?undefined:v);
+function stat(){const e=$('#sy');if(e)e.textContent=SYNC}
+async function initDb(){try{if(!(window.claude&&claude.use))return;DBX=await claude.use('db');if(!DBX)return;
+ const s=await DBX.collection('programmes').get();
+ if(!s.empty){DB.progs=s.docs.map(d=>({cands:[],mlock:[],...JSON.parse(JSON.stringify(d.data()))})).sort((a,b)=>a.id-b.id);DB.progs.forEach(q=>{sent[sid(q)]=ser(q);[...q.projects,...q.res,q].forEach(o=>uid=Math.max(uid,o.id||0))});DB.cur=0;S=DB.progs[0];SYNC='Saved to your account';render()}
+ else{SYNC='Saving to your account';stat();sync()}}catch(e){DBX=null;SYNC='Saved in this browser only';stat()}}
+function sync(){if(!DBX)return;clearTimeout(syncT);syncT=setTimeout(async()=>{if(busy)return sync();busy=true;
+ try{const ids=new Set();for(const q of DB.progs){const j=ser(q),id=sid(q);ids.add(id);if(sent[id]!==j){await DBX.doc('programmes/'+id).set(JSON.parse(j));sent[id]=j}}
+  for(const id in sent)if(!ids.has(id)){await DBX.doc('programmes/'+id).delete();delete sent[id]}
+  SYNC='Saved to your account'}catch(e){SYNC=e&&e.code=='invalid_argument'?'View only: changes are not saved':'Could not save to your account'}
+ busy=false;stat()},1200)}
+function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
+async function saveFile(){
+ try{const payload=JSON.stringify({app:'pbo',v:1,progs:DB.progs},(k,v)=>k==='cands'?undefined:v,2);
+ downloadBlob(new Blob([payload],{type:'application/json'}),'programme-plans-'+new Date().toISOString().slice(0,10)+'.json');
+ SYNC='Backup downloaded · changes saved locally';stat();
+ }catch(e){alert('Could not download backup: '+e.message)}
+}
+function openFile(inp){const f=inp.files[0];if(!f)return;const rd=new FileReader();
+ rd.onload=()=>{try{const d=JSON.parse(rd.result);if(!d.progs||!d.progs.length)throw 0;if(!confirm('Replace the '+DB.progs.length+' programme(s) now open with the '+d.progs.length+' in this file?'))return;
+  DB.progs=d.progs.map(q=>({cands:[],mlock:[],...q}));DB.progs.forEach(q=>[...q.projects,...q.res,q].forEach(o=>uid=Math.max(uid,o.id||0)));DB.cur=0;S=DB.progs[0];DB.view='port';render()}catch(e){alert('That file is not a saved programme plan.')}};
+ rd.readAsText(f);inp.value=''}
+async function getDL(){if(DL)return DL;try{if(window.claude&&claude.use)DL=await claude.use('downloads')}catch(e){}return DL}
+function loadText(txt,done){try{const d=JSON.parse(txt);if(!d.progs||!d.progs.length)throw 0;if(!confirm('Replace the '+DB.progs.length+' programme(s) now open with the '+d.progs.length+' in this text?'))return;DB.progs=d.progs.map(q=>({cands:[],mlock:[],...q}));DB.progs.forEach(q=>[...q.projects,...q.res,q].forEach(o=>uid=Math.max(uid,o.id||0)));DB.cur=0;S=DB.progs[0];DB.view='port';render();done()}catch(e){alert('That text is not a saved programme plan.')}}
+function backupBox(){const t=JSON.stringify({app:'pbo',v:1,progs:DB.progs},(k,v)=>k=='cands'?undefined:v);
+ const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;background:#0009;z-index:9;display:flex;align-items:center;justify-content:center;padding:16px';
+ d.innerHTML='<div class="card" style="max-width:640px;width:100%;margin:0"><h2>Copy your plans</h2><p class="m" style="margin-top:0">File saving is not available in this view. Copy this text and paste it into a text file named plans.json. To restore later, paste the text back here and press Load.</p><textarea id="bt" style="width:100%;height:180px;font:12px monospace;background:var(--bg);color:var(--tx);border:1px solid var(--ln)"></textarea><div class="g" style="margin-top:10px"><button class="p" id="bc">Copy text</button><button id="bl">Load pasted text</button><button id="bx">Close</button></div></div>';
+ document.body.appendChild(d);const ta=d.querySelector('#bt');ta.value=t;ta.select();
+ d.querySelector('#bc').onclick=()=>{ta.select();try{navigator.clipboard.writeText(ta.value)}catch(e){document.execCommand('copy')}};
+ d.querySelector('#bl').onclick=()=>loadText(ta.value,()=>d.remove());
+ d.querySelector('#bx').onclick=()=>d.remove()}
+function rng(seed){return()=>{seed=(seed*1664525+1013904223)%4294967296;return seed/4294967296}}
+function ML(m){const[y,mo]=(S.start||'2026-10').split('-').map(Number);return new Date(y,mo-1+m,1).toLocaleString('en-GB',{month:'short',year:'numeric'})}
+
+function build(porder,rorder,chunk){
+ const pl=[],P=S.projects,free=porder.filter(p=>!p.lock&&inP(p));
+ for(let m=0;m<S.months;m++){
+  const old=S.plan&&S.plan[m];
+  if(S.mlock[m]||!inM(m)){pl.push(old||{});continue}
+  const mp={},used={},spend={},need={};S.res.forEach(r=>used[r.id]=0);
+  P.forEach(p=>{mp[p.id]={};spend[p.id]=0;
+   if(!free.includes(p)){const o=(old&&old[p.id])||{};for(const k in o){if(k in used){mp[p.id][k]=o[k];used[k]+=o[k]}}}});
+  free.forEach(p=>need[p.id]=p.demand);
+  let prog=true;
+  while(prog){prog=false;
+   for(const p of free){if(need[p.id]<.01)continue;let s=chunk?Math.min(.5,need[p.id]):need[p.id];
+    for(const r of rorder){if(s<.01)break;if(r.proj&&r.proj!=p.id)continue;
+     const x=r2(Math.min(s,r.cap-used[r.id],(p.budget/S.months-spend[p.id])/r.cost));
+     if(x>=.01){mp[p.id][r.id]=r2((mp[p.id][r.id]||0)+x);used[r.id]+=x;spend[p.id]+=x*r.cost;s-=x;need[p.id]-=x;prog=true}}}}
+  pl.push(mp)}
+ return pl}
+function pcost(plan,pid,m){let c=0;const a=(plan[m]||{})[pid]||{};for(const k in a){const r=S.res.find(r=>r.id==k);if(r)c+=a[k]*r.cost}return c}
+function pfte(plan,pid,m){let c=0;const a=(plan[m]||{})[pid]||{};for(const k in a)c+=a[k];return c}
+function score(plan){let un=0,cost=0;S.projects.forEach(p=>{for(let m=0;m<S.months;m++){un+=Math.max(0,p.demand-pfte(plan,p.id,m))*p.prio;cost+=pcost(plan,p.id,m)}});return un*1e6+cost}
+function generate(){
+ const P=S.projects,R=S.res,out=[],seen=new Set();
+ const add=(label,po,ro,ch)=>{const pl=build(po,ro,ch),sig=JSON.stringify(pl);if(seen.has(sig))return;seen.add(sig);out.push({label,plan:pl,score:score(pl)})};
+ const by=(a,f)=>[...a].sort(f),cheap=by(R,(a,b)=>a.cost-b.cost),dear=by(R,(a,b)=>b.cost-a.cost);
+ const o={'priority first':by(P,(a,b)=>b.prio-a.prio),'best-funded first':by(P,(a,b)=>b.budget/b.demand-a.budget/a.demand),'largest demand first':by(P,(a,b)=>b.demand-a.demand),'smallest demand first':by(P,(a,b)=>a.demand-b.demand)};
+ for(const k in o){add('Lowest-cost resources, '+k,o[k],cheap,false);add('Fair share in 0.5 FTE rounds, '+k,o[k],cheap,true);add('Premium resources, '+k,o[k],dear,false)}
+ const g=rng(7);for(let i=0;i<40;i++){const sh=a=>by(a,()=>g()-.5);add('Alternative mix '+(i+1),sh(P),i%3?sh(R):cheap,g()>.5)}
+ return out.sort((a,b)=>a.score-b.score)}
+function scopeTxt(){const m=S.selM?S.selM.length:S.months,p=S.selP?S.selP.length:S.projects.length;return p+' project'+(p>1?'s':'')+' × '+m+' month'+(m>1?'s':'')}
+function run(){if(!S.projects.length||!S.res.length){alert('Add at least one project and one resource.');return false}
+ if((S.selM&&!S.selM.length)||(S.selP&&!S.selP.length)){alert('Select at least one month and one project.');return false}
+ S.cands=generate();S.ci=0;S.plan=S.cands[0].plan;S.stale=false;S.note='Best of '+S.cands.length+' options found for '+scopeTxt()+'. Everything outside this scope was left unchanged.';return true}
+function optimise(){if(run()){DB.view='plan';render()}}
+function optimiseAll(){const o=S;DB.progs.forEach(q=>{S=q;run()});S=o;DB.view='port';render()}
+function another(){if(!S.cands.length)return optimise();S.ci=(S.ci+1)%S.cands.length;S.plan=S.cands[S.ci].plan;S.note='Showing option '+(S.ci+1)+' of '+S.cands.length+(S.ci?'':' (the best).');render()}
+function reopt(pid){S.selP=[pid];optimise()}
+function reoptM(m){S.selM=[m];optimise()}
+function togM(m){let a=S.selM||[...Array(S.months).keys()];a=a.includes(m)?a.filter(x=>x!=m):[...a,m];S.selM=a.length==S.months?null:a;render()}
+function togP(id){let a=S.selP||S.projects.map(p=>p.id);a=a.includes(id)?a.filter(x=>x!=id):[...a,id];S.selP=a.length==S.projects.length?null:a;render()}
+function selAll(){S.selM=null;S.selP=null;render()}
+
+function stats(q){const o=S;S=q;let cost=0,un=0;
+ if(q.plan)q.projects.forEach(p=>{for(let m=0;m<q.months;m++){cost+=pcost(q.plan,p.id,m);un+=Math.max(0,p.demand-pfte(q.plan,p.id,m))}});
+ S=o;return{cost,un,alloc:q.projects.reduce((a,p)=>a+p.budget,0)}}
+
+function U(k,i,f,v){S[k][i][f]=v;if(f!='name')S.stale=!!S.plan;render()}
+function lockP(i){const p=S.projects[i];if(!p.lock&&!S.plan){alert('Run Optimise plan first so there is an allocation to lock.');return}p.lock=!p.lock;render()}
+function add(k){if(k=='projects')S.projects.push({id:++uid,name:'New project',budget:0,demand:1,prio:3,lock:false});else S.res.push({id:++uid,name:'New resource',cost:5000,cap:1});S.stale=!!S.plan;render()}
+function del(k,i){if(!confirm('Remove this item?'))return;S[k].splice(i,1);S.selP=null;S.stale=!!S.plan;render()}
+function edit(m,pid,rid,v){const p=S.projects.find(x=>x.id==pid);if(p.lock||S.mlock[m])return;S.plan[m]=S.plan[m]||{};S.plan[m][pid]=S.plan[m][pid]||{};S.plan[m][pid][rid]=Math.max(0,+v||0);render()}
+function nextMonth(){if(S.months>=24)return;if(S.plan)for(let m=0;m<S.months;m++)S.mlock[m]=true;S.months++;S.month=S.months-1;S.selM=null;if(S.plan)optimise();else{DB.view='plan';render()}}
+function load(){try{const d=JSON.parse(localStorage.getItem('pbo2'));if(d&&d.progs&&d.progs.length){d.progs.forEach(q=>{q.cands=[];q.mlock=q.mlock||[];[...q.projects,...q.res,q].forEach(o=>uid=Math.max(uid,o.id||0))});return d}}catch(e){}return{progs:[mk()],cur:0,view:'port'}}
+let localSaveTimer=null;
+function save(){
+ const json=JSON.stringify(DB,(k,v)=>k==='cands'?undefined:v);
+ try{localStorage.setItem('pbo2',json)}catch(e){SYNC='Browser storage full · download a backup';stat()}
+ if(localDb&&hydrated){clearTimeout(localSaveTimer);localSaveTimer=setTimeout(()=>{
+  try{const tx=localDb.transaction('workspace','readwrite');tx.objectStore('workspace').put(json,'active');
+   tx.oncomplete=()=>{SYNC='Saved locally on this device';stat()};tx.onerror=()=>{SYNC='Local save failed · download a backup';stat()}
+  }catch(e){SYNC='Local save failed · download a backup';stat()}
+ },350)}
+ sync()
+}
+function initLocalStorage(){
+ if(!('indexedDB' in window)){hydrated=true;SYNC='Browser autosave · download backups';stat();return}
+ const request=indexedDB.open('programme-budget-optimiser',1);
+ request.onupgradeneeded=()=>{const d=request.result;if(!d.objectStoreNames.contains('workspace'))d.createObjectStore('workspace')};
+ request.onerror=()=>{hydrated=true;SYNC='Browser autosave · download backups';stat()};
+ request.onsuccess=()=>{
+  localDb=request.result;const tx=localDb.transaction('workspace','readonly');const get=tx.objectStore('workspace').get('active');
+  get.onsuccess=()=>{try{if(get.result){const d=JSON.parse(get.result);if(d.progs&&d.progs.length){DB=d;DB.progs.forEach(q=>{q.cands=[];q.mlock=q.mlock||[];[...q.projects,...q.res,q].forEach(o=>uid=Math.max(uid,o.id||0))});DB.cur=Math.min(DB.cur||0,DB.progs.length-1);S=DB.progs[DB.cur]}}}catch(e){}
+   hydrated=true;SYNC='Saved locally on this device';render()};
+  get.onerror=()=>{hydrated=true;SYNC='Browser autosave';stat()};
+ }
+}
+function sw(i){DB.cur=i;S=DB.progs[i];S.month=0;if(DB.view=='port')DB.view='plan';render()}
+function addProg(){const q={id:++uid,name:'New programme '+(DB.progs.length+1),budget:0,months:1,start:S.start,mlock:[],selM:null,selP:null,projects:[],res:[],plan:null,cands:[],ci:0,month:0,stale:false};DB.progs.push(q);DB.cur=DB.progs.length-1;S=q;DB.view='setup';render()}
+function delProg(){if(DB.progs.length<2){alert('Keep at least one programme.');return}if(!confirm('Delete '+S.name+'?'))return;DB.progs.splice(DB.cur,1);DB.cur=0;S=DB.progs[0];DB.view='port';render()}
+
+async function xl(){
+ if(typeof XLSX==='undefined'){alert('Excel export library could not load. Please connect to the internet and reopen the application, then try again.');return;}
+ const A=[['Programme','Budget','Allocated to projects','Planned cost','Budget used %','Unfilled FTE-months']],B=[['Programme','Project','Priority','Budget','Share of programme %','Planned cost','Remaining','Avg FTE per month','FTE needed per month','Locked']],C=[['Programme','Month','Project','Resource','FTE','Cost per FTE','Cost']],D=[['Programme','Resource','Project','Cost per FTE per month','Available FTE']];
+ const o=S;
+ DB.progs.forEach(q=>{const st=stats(q);S=q;
+  A.push([q.name,q.budget,st.alloc,Math.round(st.cost),q.budget?+(st.cost/q.budget*100).toFixed(1):0,+st.un.toFixed(2)]);
+  q.res.forEach(r=>D.push([q.name,r.name,(q.projects.find(p=>p.id==r.proj)||{}).name||'Shared across programme',r.cost,r.cap]));
+  q.projects.forEach(p=>{let c=0,f=0;if(q.plan)for(let m=0;m<q.months;m++){c+=pcost(q.plan,p.id,m);f+=pfte(q.plan,p.id,m);
+    const a=(q.plan[m]||{})[p.id]||{};for(const k in a){const r=q.res.find(x=>x.id==k);if(r&&a[k]>0)C.push([q.name,ML(m),p.name,r.name,a[k],r.cost,Math.round(a[k]*r.cost)])}}
+   B.push([q.name,p.name,p.prio,p.budget,q.budget?+(p.budget/q.budget*100).toFixed(1):0,Math.round(c),Math.round(p.budget-c),+(f/q.months).toFixed(2),p.demand,p.lock?'Yes':'No'])})});
+ S=o;
+ const wb=XLSX.utils.book_new();
+ [['Portfolio',A],['Projects',B],['Allocation',C],['Resources',D]].forEach(([n,a])=>{const ws=XLSX.utils.aoa_to_sheet(a);ws['!cols']=a[0].map(()=>({wch:22}));XLSX.utils.book_append_sheet(wb,ws,n)});
+ try{const bytes=XLSX.write(wb,{type:'array',bookType:'xlsx'});downloadBlob(new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'programme-cost-plan.xlsx')}catch(e){alert('Could not generate Excel workbook: '+(e.message||e))}}
+
+const PALETTES=['ocean','royal','emerald','sunset','rose','midnight'];
+function paletteInit(){let p='ocean';try{p=localStorage.getItem('pbo-palette')||'ocean'}catch(e){}document.documentElement.dataset.palette=PALETTES.includes(p)?p:'ocean'}
+function setPalette(p){if(!PALETTES.includes(p))return;document.documentElement.dataset.palette=p;try{localStorage.setItem('pbo-palette',p)}catch(e){}render()}
+function head(){const pal=document.documentElement.dataset.palette||'ocean';return `<header class="hd"><div class="header-top"><div class="header-left"><div class="brand-mark">P<span>↗</span></div><div><div class="brand-eyebrow">PLANNING &amp; FINANCIAL INTELLIGENCE</div><div class="brand-sub">A clearer way to plan people, projects and spend</div></div></div><div class="header-right"><span class="version-label">WORKSPACE · V0.9</span><div class="brand-title">Programme <strong>Budget Optimiser</strong></div><div class="brand-tagline">Your portfolio, resources and costs — in one place.</div></div></div><div class="header-actions"><div class="save-status"><span class="status-led"></span><span id="sy">${SYNC}</span></div><div class="action-group"><button onclick="$('#of').click()">↥ Restore backup</button><input type="file" id="of" accept=".json,application/json" hidden onchange="openFile(this)"><button onclick="saveFile()">↓ Save backup</button><button onclick="optimiseAll()">⚡ Optimise all</button><button class="p" onclick="xl()">↓ Download Excel</button></div><label class="theme-select">Colour theme <select aria-label="Colour theme" onchange="setPalette(this.value)">${[['ocean','Ocean blue'],['royal','Royal purple'],['emerald','Emerald'],['sunset','Sunset amber'],['rose','Rose'],['midnight','Midnight']].map(([v,n])=>`<option value="${v}" ${v===pal?'selected':''}>${n}</option>`).join('')}</select></label></div></header>`}
+function nav(){const v=DB.view;return `<div class="bar2"><div class="seg nav-primary"><button class="${v=='port'?'on':''}" onclick="DB.view='port';render()">◫ Portfolio</button><button class="${v=='setup'?'on':''}" onclick="DB.view='setup';render()">⚙ Setup</button><button class="${v=='res'?'on':''}" onclick="DB.view='res';render()">♧ Resources</button><button class="${v=='plan'?'on':''}" onclick="DB.view='plan';render()">▤ Allocation plan</button></div><div class="nav-workspace"><label>Active programme<select onchange="sw(+this.value)">${DB.progs.map((q,i)=>`<option value="${i}" ${i==DB.cur?'selected':''}>${E(q.name||'Untitled')}</option>`).join('')}</select></label><button onclick="addProg()">+ New programme</button></div></div>`}
+
+
+let sidebarCollapsed=false;
+function toggleSidebar(){sidebarCollapsed=!sidebarCollapsed;render()}
+function sideNav(){const v=DB.view||'port';const opts=[['port','◫','Portfolio'],['setup','⚙','Programme setup'],['res','♧','Resources'],['plan','▤','Allocation plan']];return `<aside class="side"><button class="side-toggle" onclick="toggleSidebar()">☰ <span class="nav-name">Collapse menu</span></button><div class="side-label">WORKSPACE</div><div class="side-nav">${opts.map(([id,ic,name])=>`<button class="${v===id?'on':''}" onclick="DB.view='${id}';render()" title="${name}">${ic} <span class="nav-name">${name}</span></button>`).join('')}</div><div class="side-label">PROGRAMME</div><div class="sidebar-workspace"><label>Active programme<select onchange="sw(+this.value)">${DB.progs.map((q,i)=>`<option value="${i}" ${i===DB.cur?'selected':''}>${E(q.name)}</option>`).join('')}</select></label><button onclick="addProg()">+ New programme</button></div><div class="side-foot">Your planning workspace<br>Locally stored in this browser. Download regular backups.</div></aside>`}
+function executiveCharts(){const q=DB.progs;const budget=q.reduce((a,x)=>a+(+x.budget||0),0);const cost=q.reduce((a,x)=>a+stats(x).cost,0);const used=budget>0?Math.max(0,Math.min(100,cost/budget*100)):0;const rest=Math.max(0,100-used);const over=cost>budget&&budget>0;const rows=q.map(x=>({name:x.name,cost:stats(x).cost,budget:+x.budget||0}));const scale=Math.max(1,...rows.map(x=>Math.max(x.cost,x.budget)));return `<div class="visual-grid"><section class="card viz-card"><h2>Budget utilisation</h2><p class="viz-caption">Portfolio-wide planned expenditure against available budget</p><div class="donut-layout"><div class="donut" style="background:conic-gradient(var(--ac) 0 ${used}%,var(--ln) ${used}% 100%)"><div class="donut-core"><strong>${budget?Math.round(cost/budget*100):0}%</strong><small>Budget used</small></div></div><div class="legend"><span><i style="background:var(--ac)"></i>Planned cost: £${fmt(cost)}</span><span><i style="background:var(--ln)"></i>Remaining: £${fmt(budget-cost)}</span>${over?'<span class="b">Over the total budget</span>':''}</div></div></section><section class="card viz-card"><h2>Programme cost comparison</h2><p class="viz-caption">Planned costs across programmes; bars scaled to the largest programme budget or cost</p>${rows.map(x=>`<div class="viz-row"><span class="viz-name" title="${E(x.name)}">${E(x.name)}</span><div class="viz-track"><span style="width:${Math.min(100,x.cost/scale*100)}%"></span></div><span class="viz-value">£${fmt(x.cost)}</span></div>`).join('')||'<p class="m">No programmes available</p>'}</section></div>`}
+
+function portfolio(){
+ let tb=0,tc=0,tu=0;
+ const rows=DB.progs.map((q,i)=>{const s=stats(q);tb+=q.budget;tc+=s.cost;tu+=s.un/q.months;const pct=q.budget?s.cost/q.budget*100:0;
+  const st=!q.plan?'<span class="m">Not optimised</span>':s.cost>q.budget?'<span class="b">Over budget</span>':s.un>.01?'<span class="w">Demand not met</span>':'<span class="ok">On plan</span>';
+  return `<tr><td><b>${E(q.name)}</b></td><td class="n">${fmt(q.budget)}</td><td class="n">${fmt(s.alloc)}</td><td class="n">${fmt(s.cost)}</td><td><div class="pb"><i class="${pct>100?'o':''}" style="width:${Math.min(100,pct)}%"></i></div></td><td class="n">${pct.toFixed(0)}%</td><td class="n">${(s.un/q.months).toFixed(2)}</td><td>${st}</td><td><button class="s" onclick="sw(${i})">Open</button></td></tr>`}).join('');
+ return `<div class="k"><div><span>Programmes</span><b class="big">${DB.progs.length}</b></div><div><span>Total budget</span><b class="big">${fmt(tb)}</b></div><div><span>Planned cost</span><b class="big">${fmt(tc)}</b></div><div><span>Budget remaining</span><b class="big">${fmt(tb-tc)}</b></div><div><span>Unfilled FTE per month</span><b class="big ${tu>.01?'w':''}">${tu.toFixed(2)}</b></div></div>
+ ${executiveCharts()}<div class="card"><h2>Portfolio overview</h2><div class="sc"><table><tr><th>Programme</th><th class="n">Budget</th><th class="n">Allocated</th><th class="n">Planned cost</th><th>Used</th><th class="n">%</th><th class="n">Unfilled FTE</th><th>Status</th><th></th></tr>${rows}
+ <tr class="t"><td>Total</td><td class="n">${fmt(tb)}</td><td></td><td class="n">${fmt(tc)}</td><td></td><td class="n">${tb?(tc/tb*100).toFixed(0):0}%</td><td class="n">${tu.toFixed(2)}</td><td></td><td></td></tr></table></div></div>`}
+
+function setup(){
+ const P=S.projects.map((p,i)=>`<tr class="${p.lock?'lk':''}"><td><input value="${E(p.name)}" onchange="U('projects',${i},'name',this.value)"></td>
+ <td><input type="number" min="0" value="${p.budget}" onchange="U('projects',${i},'budget',+this.value)"></td><td class="n">${S.budget?(p.budget/S.budget*100).toFixed(1):0}%</td>
+ <td><input type="number" min="0" step="0.5" value="${D2(p.demand)}" onchange="U('projects',${i},'demand',+this.value/KK())"></td>
+ <td><select onchange="U('projects',${i},'prio',+this.value)">${[1,2,3,4,5].map(n=>`<option ${n==p.prio?'selected':''}>${n}</option>`).join('')}</select></td>
+ <td><button class="s" onclick="lockP(${i})">${p.lock?'Locked – unlock':'Lock'}</button> <button class="s x" onclick="del('projects',${i})">Remove</button></td></tr>`).join('');
+ const R=S.res.map((r,i)=>`<tr><td><input value="${E(r.name)}" onchange="U('res',${i},'name',this.value)"></td><td><input type="number" min="0" value="${r.cost}" onchange="U('res',${i},'cost',+this.value)"></td><td><input type="number" min="0" step="0.5" value="${r.cap}" onchange="U('res',${i},'cap',+this.value)"></td><td><button class="s x" onclick="del('res',${i})">Remove</button></td></tr>`).join('');
+ const tot=S.projects.reduce((a,p)=>a+p.budget,0),dm=S.projects.reduce((a,p)=>a+p.demand,0),cp=S.res.reduce((a,r)=>a+r.cap,0);
+ return `<div class="card"><h2>Programme details</h2><div class="g">
+ <label>Programme name<input value="${E(S.name)}" onchange="S.name=this.value;render()"></label>
+ <label>Total budget<input type="number" min="0" value="${S.budget}" onchange="S.budget=+this.value;S.stale=!!S.plan;render()"></label>
+ <label>First month<input type="month" value="${S.start}" onchange="S.start=this.value;render()"></label>
+ <label>Effort and rates<select onchange="S.unit=this.value;render()"><option value="month" ${S.unit!='day'?'selected':''}>Per month (FTE)</option><option value="day" ${S.unit=='day'?'selected':''}>Per day</option></select></label>
+ <label>Working days per month<input type="number" min="1" max="31" value="${S.wd||20}" onchange="S.wd=+this.value||20;render()"></label>
+ <label>Months planned<input type="number" min="1" max="24" value="${S.months}" onchange="S.months=Math.max(1,Math.min(24,+this.value||1));S.selM=null;S.stale=!!S.plan;render()"></label></div>
+ <p class="${tot>S.budget?'b':'m'}" style="margin:10px 0 0">Project budgets total ${fmt(tot)} of ${fmt(S.budget)} (${S.budget?(tot/S.budget*100).toFixed(0):0}%)${tot>S.budget?' – above the programme budget':''}.</p></div>
+ <div class="card"><h2>Projects</h2><div class="sc"><table><tr><th>Project</th><th>Budget</th><th class="n">Share</th><th>${S.unit=='day'?'Days':'FTE'} needed per month</th><th>Priority (5 = high)</th><th></th></tr>${P}</table></div>
+ <div class="g" style="margin-top:10px"><button onclick="add('projects')">Add project</button></div>
+ <p class="m" style="margin:10px 0 0">Locking a project freezes its current FTE allocation. The optimiser never changes it and keeps those people reserved.</p></div>
+ <div class="card"><h2>Resources</h2><p class="m" style="margin:0 0 10px">People and rates are managed in the Resources tab.</p>
+ <div class="g" style="margin-top:10px"><button onclick="DB.view='res';render()">Open Resources</button><button class="x" onclick="delProg()">Delete this programme</button></div>
+ <p class="${dm>cp?'w':'m'}" style="margin:10px 0 0">Demand ${D2(dm)} ${UL()} against capacity ${D2(cp)} ${UL()}${dm>cp?' – some demand cannot be met':''}.</p></div>
+ <div class="g"><button class="p" onclick="optimise()">Optimise plan</button></div>`}
+
+function plan(){
+ const M=S.months,P=S.projects,pl=S.plan;
+ const chM=Array.from({length:M},(_,m)=>`<button class="chip ${inM(m)?'on':''}" onclick="togM(${m})">${ML(m)}${S.mlock[m]?' (locked)':''}</button>`).join(' ');
+ const chP=P.map((p,pi)=>`<button class="chip ${inP(p)?'on':''}" onclick="togP(${p.id})"><span class="dot" style="background:${PC(pi)}"></span>${E(p.name)}${p.lock?' (locked)':''}</button>`).join(' ');
+ const ctl=`<div class="card"><h2>${E(S.name)}: choose what to optimise</h2>
+ <div class="lbl">Months</div><div class="seg">${chM}</div><div class="lbl">Projects</div><div class="seg">${chP||'<span class="m">No projects yet. Add them in Setup.</span>'}</div>
+ <div class="g" style="margin-top:14px"><button class="p" onclick="optimise()">Optimise selected (${scopeTxt()})</button><button onclick="selAll()">Select all</button><button onclick="another()" ${pl?'':'disabled'}>Try another option</button><button onclick="nextMonth()">Add next month</button></div>
+ <p class="m" style="margin:10px 0 0">Only the selected projects and months change. Locked projects and locked months are never touched.</p></div>`;
+ if(!pl)return ctl+`<div class="card"><p class="m" style="margin:0">No plan yet. Choose Optimise selected to create one.</p></div>`;
+ let tc=0,un=0;
+ const rows=P.map((p,pi)=>{let c=0,f=0;for(let m=0;m<M;m++){c+=pcost(pl,p.id,m);f+=pfte(pl,p.id,m)}tc+=c;const u=Math.max(0,p.demand*M-f);un+=u;const pct=p.budget?c/p.budget*100:0;
+  return `<tr class="${p.lock?'lk':''}"><td><span class="dot" style="background:${PC(pi)}"></span><b>${E(p.name)}</b>${p.lock?' (locked)':''}</td><td class="n">${fmt(p.budget)}</td><td class="n">${fmt(c)}</td><td><div class="pb"><i class="${pct>100?'o':''}" style="${pct>100?'':'background:'+PC(pi)+';'}width:${Math.min(100,pct)}%"></i></div></td><td class="n">${pct.toFixed(0)}%</td><td class="n">${D2(f/M)} / ${D2(p.demand)}</td><td>${u>.01?'<span class="pill w">'+D2(u/M)+' '+UL()+' short</span>':'<span class="pill ok">Covered</span>'}</td><td class="n">${fmt(p.budget-c)}</td><td><button class="s" onclick="reopt(${p.id})" ${p.lock?'disabled':''}>Re-optimise</button></td></tr>`}).join('');
+ const mc=Array.from({length:M},(_,m)=>`${ML(m)}: <b>${fmt(P.reduce((a,p)=>a+pcost(pl,p.id,m),0))}</b>`).join(' &nbsp;|&nbsp; ');
+ const m=Math.min(S.month,M-1);
+ const tabs=Array.from({length:M},(_,i)=>`<button class="${i==m?'on':''}" onclick="S.month=${i};render()">${ML(i)}${S.mlock[i]?' (locked)':''}</button>`).join('');
+ const grid=S.res.map(r=>{const used=P.reduce((a,p)=>a+(((pl[m]||{})[p.id]||{})[r.id]||0),0);
+  return `<tr><td>${E(r.name)}</td>${P.map(p=>`<td><input type="number" step="0.25" min="0" ${p.lock||S.mlock[m]?'disabled':''} value="${D2(((pl[m]||{})[p.id]||{})[r.id]||0)}" onchange="edit(${m},${p.id},${r.id},this.value/KK())"></td>`).join('')}<td class="n ${used>r.cap+.001?'b':'m'}">${D2(used)} / ${D2(r.cap)}</td></tr>`}).join('');
+ const RES=resCard();return (S.stale?`<div class="note w2">Inputs changed since this plan was made. Optimise again to apply them.</div>`:'')+`
+ <div class="k"><div><span>Planned cost, ${M} month${M>1?'s':''}</span><b class="big">${fmt(tc)}</b></div><div><span>Budget remaining</span><b class="big">${fmt(S.budget-tc)}</b></div><div><span>Budget used</span><b class="big">${S.budget?(tc/S.budget*100).toFixed(0):0}%</b></div><div><span>Unfilled ${UL()} per month</span><b class="big ${un>.01?'w':''}">${D2(un/M)}</b></div></div>
+ <div class="card"><h2>Project results</h2><div class="note">${S.note||''}${S.cands[S.ci]?' Approach: '+S.cands[S.ci].label+'.':''}</div>
+ <div class="sc"><table><tr><th>Project</th><th class="n">Budget</th><th class="n">Planned cost</th><th>Used</th><th class="n">%</th><th class="n">${UL()} per month</th><th>Status</th><th class="n">Remaining</th><th></th></tr>${rows}</table></div>
+ <p class="m" style="margin:10px 0 0">Cost by month: ${mc}</p></div>
+ ${RES}${ctl}<div class="card"><h2>Allocation by month (${UL()})</h2><div class="seg" style="margin-bottom:10px">${tabs}</div>
+ <div class="g" style="margin-bottom:10px"><button onclick="S.mlock[${m}]=!S.mlock[${m}];render()">${S.mlock[m]?'Unlock':'Lock'} ${ML(m)}</button><button onclick="reoptM(${m})" ${S.mlock[m]?'disabled':''}>Optimise ${ML(m)} only</button></div>
+ <div class="sc"><table><tr><th>Resource</th>${P.map(p=>`<th>${E(p.name)}${p.lock?' (locked)':''}</th>`).join('')}<th class="n">Used / available</th></tr>${grid}</table></div>
+ <p class="m" style="margin:10px 0 0">Cells can be edited by hand for unlocked projects and months.</p></div>`}
+
+function render(){const v=DB.view||'port';$('#app').innerHTML=head()+`<div class="shell ${sidebarCollapsed?'collapsed':''}">`+sideNav()+'<main>'+`<div class="workspace-intro"><div><h2>${v==='port'?'Portfolio overview':v==='setup'?'Programme setup':v==='res'?'Resource management':'Allocation workspace'}</h2><p>Plan budgets, balance capacity and compare practical allocation options.</p></div><span class="m">Local workspace · Private to this browser</span></div>`+nav()+(v==='port'?portfolio():v==='setup'?setup():v==='res'?resView():plan())+'</main></div>';save()}
+
+paletteInit();render();initLocalStorage();
+</script></body></html>
